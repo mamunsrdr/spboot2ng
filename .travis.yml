@@ -4,4 +4,5 @@ jdk:
 install:
   - /bin/true
 script:
-  - chmod +x ./gradlew build
+  - chmod +x gradlew
+  - ./gradlew build
