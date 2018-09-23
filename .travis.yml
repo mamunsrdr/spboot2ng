@@ -1,0 +1,10 @@
+language: java
+jdk:
+  - openjdk8
+env:
+  global:
+    - TERM=dumb
+install:
+  - /bin/true
+script:
+  - ./gradlew build
