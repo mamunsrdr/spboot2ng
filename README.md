@@ -1,18 +1,44 @@
-# BootVue [![Build Status](https://travis-ci.org/mamunsrdr/bootvue.svg?branch=master)](https://travis-ci.org/mamunsrdr/bootvue)
+# Spring boot 2 Ng 6 [![Build Status](https://travis-ci.org/mamunsrdr/bootvue.svg?branch=master)](https://travis-ci.org/mamunsrdr/bootvue)
 A **Spring boot 2** and **angular 6** starter project<br>
-![Build Status](https://i.imgur.com/IgIkC7Pl.png)
 
 ### What's included
 * spring boot 2.0.5
 * angular: 6.1.0
 
 ### Project structure
-Grails `rest-api` profile is used in this project.<br>
-Vue app is placed under `src/app` directory with following modification on `config/index.js`:
+Angular app is placed under `src/main/resources/static` directory with following modification on `angular.json`:
 ```
-index: path.resolve(__dirname, '../../main/webapp/index.html'),
-assetsRoot: path.resolve(__dirname, '../../main/webapp'),
+"outputPath": "src/main/resources/static",
+
+//moved environment under app
+"replace": "src/app/environments/environment.ts",
+"with": "src/app/environments/environment.prod.ts"
 ```
+Also added template resolver config to resolve `index.html` view from static folder
+```
+@Bean
+public ITemplateResolver clientTemplateResolver() {
+    SpringResourceTemplateResolver resolver = new SpringResourceTemplateResolver();
+    resolver.setPrefix("classpath:/static/");
+    resolver.setSuffix(".html");
+    resolver.setTemplateMode(TemplateMode.HTML);
+    resolver.setCacheable(false);
+    resolver.setOrder(1);
+    return resolver;
+}
+
+@Bean
+public TemplateEngine appTemplateEngine() {
+    ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
+    resolver.setSuffix(".html");
+    resolver.setCharacterEncoding("UTF-8");
+    resolver.setTemplateMode(TemplateMode.HTML);
+    TemplateEngine templateEngine = new TemplateEngine();
+    templateEngine.setTemplateResolver(resolver);
+    return templateEngine;
+}
+```
+
 ### Gradle plugin and tasks
 ```
 buildscript {
@@ -27,57 +53,47 @@ apply plugin: "com.moowork.node"
 ```
 ```
 node {
-    version = '9.1.0'
-    npmVersion = '5.5.1'
-    yarnVersion = '1.3.2'
+    version = "10.8.0"
+    npmVersion = '6.2.0'
     download = true
-    distBaseUrl = 'https://nodejs.org/dist'
-    nodeModulesDir = file("src/app")
 }
 
-task watchApp(type: YarnTask, dependsOn: 'yarn') {
-    group = 'application'
-    description = 'Build and watch client side assets'
-    args = ['run', 'dev']
-}
-
-task buildApp(type: YarnTask, dependsOn: 'yarn') {
+task buildApp(type: NpmTask, dependsOn: 'npmInstall') {
     group = 'build'
-    description = 'Compile client side assets for production'
     args = ['run', 'build']
 }
 
-task testApp(type: YarnTask, dependsOn: 'yarn') {
-    group = 'verification'
-    description = 'Executes client side unit tests'
-    args = ['run', 'unit']
+task buildWatch(type: NpmTask, dependsOn: 'npmInstall') {
+    group = 'application'
+    args = ['run', 'buildWatch']
 }
 
-bootRun.dependsOn(buildApp)
-
-assetCompile.dependsOn(buildApp)
-
-test.dependsOn(testApp)
-
 clean {
-    def ft = fileTree('src/main/webapp').exclude(".gitkeep")
+    def ft = fileTree('src/main/resources/static')
     ft.visit { FileVisitDetails fvd ->
         delete fvd.file
     }
 }
+
+war {
+    dependsOn 'buildApp'
+}
+
 ```
 
 
 ### Sample command
 ```
-// start grails application
-# grails run-app
+// to build war with angular app
+# gradlew bootRun
 
 // run this watcher task
-# ./gradlew watchApp
+# ./gradlew buildWatch
 // or for win
-# gradlew watchApp
+# gradlew buildWatch
 
 // build war file as usual
-# grails war
+# gradlew assemble
 ```
+Personally in IntelliJ idea I like to run debug window and terminal (`gradlew buildWatch`) side by side like this:
+![Screenshot](https://i.imgur.com/mKwBdef.png)
