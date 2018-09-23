@@ -1,4 +1,4 @@
-# Spring boot 2 Ng 6 [![Build Status](https://travis-ci.org/mamunsrdr/bootvue.svg?branch=master)](https://travis-ci.org/mamunsrdr/bootvue)
+# Spring boot 2 Ng 6 [![Build Status](https://travis-ci.org/mamunsrdr/spboot2ng.svg?branch=master)](https://travis-ci.org/mamunsrdr/spboot2ng)
 A **Spring boot 2** and **angular 6** starter project<br>
 
 ### What's included
