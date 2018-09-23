@@ -6,7 +6,7 @@ A **Spring boot 2** and **angular 6** starter project<br>
 * angular: 6.1.0
 
 ### Project structure
-Angular app is placed under `src/main/resources/static` directory with following modification on `angular.json`:
+Angular app will be placed under `src/main/resources/static` directory after build
 ```
 "outputPath": "src/main/resources/static",
 
@@ -43,6 +43,10 @@ public TemplateEngine appTemplateEngine() {
 ```
 buildscript {
     // ... other configs ...
+    repositories {
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
     dependencies {
         // ... other classpath dependencies ...
         classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
@@ -94,6 +98,9 @@ war {
 
 // build war file as usual
 # gradlew assemble
+
+// normal build
+# gradlew build
 ```
 Personally in IntelliJ idea I like to run debug window and terminal (`gradlew buildWatch`) side by side like this:
 ![Screenshot](https://i.imgur.com/mKwBdef.png)
