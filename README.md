@@ -1,1 +1,83 @@
-# spboot2ng
+# BootVue [![Build Status](https://travis-ci.org/mamunsrdr/bootvue.svg?branch=master)](https://travis-ci.org/mamunsrdr/bootvue)
+A **Spring boot 2** and **angular 6** starter project<br>
+![Build Status](https://i.imgur.com/IgIkC7Pl.png)
+
+### What's included
+* spring boot 2.0.5
+* angular: 6.1.0
+
+### Project structure
+Grails `rest-api` profile is used in this project.<br>
+Vue app is placed under `src/app` directory with following modification on `config/index.js`:
+```
+index: path.resolve(__dirname, '../../main/webapp/index.html'),
+assetsRoot: path.resolve(__dirname, '../../main/webapp'),
+```
+### Gradle plugin and tasks
+```
+buildscript {
+    // ... other configs ...
+    dependencies {
+        // ... other classpath dependencies ...
+        classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
+    }
+}
+// apply plugin
+apply plugin: "com.moowork.node"
+```
+```
+node {
+    version = '9.1.0'
+    npmVersion = '5.5.1'
+    yarnVersion = '1.3.2'
+    download = true
+    distBaseUrl = 'https://nodejs.org/dist'
+    nodeModulesDir = file("src/app")
+}
+
+task watchApp(type: YarnTask, dependsOn: 'yarn') {
+    group = 'application'
+    description = 'Build and watch client side assets'
+    args = ['run', 'dev']
+}
+
+task buildApp(type: YarnTask, dependsOn: 'yarn') {
+    group = 'build'
+    description = 'Compile client side assets for production'
+    args = ['run', 'build']
+}
+
+task testApp(type: YarnTask, dependsOn: 'yarn') {
+    group = 'verification'
+    description = 'Executes client side unit tests'
+    args = ['run', 'unit']
+}
+
+bootRun.dependsOn(buildApp)
+
+assetCompile.dependsOn(buildApp)
+
+test.dependsOn(testApp)
+
+clean {
+    def ft = fileTree('src/main/webapp').exclude(".gitkeep")
+    ft.visit { FileVisitDetails fvd ->
+        delete fvd.file
+    }
+}
+```
+
+
+### Sample command
+```
+// start grails application
+# grails run-app
+
+// run this watcher task
+# ./gradlew watchApp
+// or for win
+# gradlew watchApp
+
+// build war file as usual
+# grails war
+```
